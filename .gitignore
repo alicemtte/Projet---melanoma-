@@ -1,6 +1,10 @@
-__pycache__/*.pyc
-*.jpg
-*.png
-*.zip
-ISIC_2019_Training
+# Data files
 data/
+*.jpg
+*.jpeg
+*.zip
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
