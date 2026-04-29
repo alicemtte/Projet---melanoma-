@@ -42,7 +42,7 @@ print(f"Train: {len(train_df)} | Val: {len(val_df)} | Test: {len(test_df)}")
 train_df[['image','label','label_idx','filepath']].to_csv(
     os.path.join(SPLIT_DIR, 'train.csv'), index=False)
 val_df[['image','label','label_idx','filepath']].to_csv(
-    os.path.join(SPLIT_DIR, 'validation.csv'), index=False)
+    os.path.join(SPLIT_DIR, 'val.csv'), index=False)
 test_df[['image','label','label_idx','filepath']].to_csv(
     os.path.join(SPLIT_DIR, 'test.csv'), index=False)
 
@@ -84,21 +84,32 @@ val_transform = transforms.Compose([
 # we apply random flip and and augmentation to make the model robust and generalized to lots of features
 
 
-class ISICDataset(Dataset):
+class ISICDatasetCached(Dataset):
     def __init__(self, dataframe, transform=None):
-        self.df        = dataframe.reset_index(drop=True)
         self.transform = transform
+        self.labels = dataframe['label_idx'].values
+
+        print(f"Caching {len(dataframe)} images into RAM...")
+        self.images = []
+        for i, row in dataframe.iterrows():
+            img = Image.open(row['filepath']).convert('RGB')
+            self.images.append(img.copy())
+            if len(self.images) % 2000 == 0:
+                print(f"  {len(self.images)}/{len(dataframe)} loaded")
+        print("Caching complete.")
 
     def __len__(self):
-        return len(self.df)
+        return len(self.labels)
 
     def __getitem__(self, idx):
-        row   = self.df.iloc[idx]
-        image = Image.open(row['filepath']).convert('RGB')
-        label = int(row['label_idx'])
+        image = self.images[idx]
+        label = int(self.labels[idx])
         if self.transform:
             image = self.transform(image)
         return image, label
+
+
+
 
 
 print("\nRunning DataLoader check")
