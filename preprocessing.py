@@ -106,6 +106,6 @@ sample_ds = ISICDataset(train_df.head(16), transform=train_transform)
 sample_dl = DataLoader(sample_ds, batch_size=4, num_workers=2)
 imgs, labels = next(iter(sample_dl))
 print(f"Batch image shape : {imgs.shape}") #4 images, 3 color channels rgb, 224×224 pixels
-print(f"Batch label shape : {labels.shape}") 
+print(f"Batch label shape : {labels.shape}")
 print(f"Label values      : {labels.tolist()}")
 print("\nPreprocessing ok")
